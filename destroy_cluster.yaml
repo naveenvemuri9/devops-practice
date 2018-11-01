@@ -22,7 +22,22 @@
          privileged: yes
          volumes: 
            - "{{cluster_home}}:/{{cluster_name}}:z"         
-         command: "terraform destroy -input=false -var 'name={{cluster_name}}' -no-color ."
+         command: "terraform init -input=false -var 'name={{cluster_name}}' -no-color ."
+      register: terraform_init_container
+
+    - name: Terraform destroy {{cluster_name}} cluster
+      debug:
+        msg:  "{{ terraform_init_container.ansible_facts.docker_container.Output }}"
+    - name: Terraform init {{cluster_name}} cluster
+      become: true   
+      docker_container:
+         name: "terraform-init-{{cluster_name}}"
+         image: naveenvemuri9/awscli-terraform-kubectl
+         detach: false
+         privileged: yes
+         volumes: 
+           - "{{cluster_home}}:/{{cluster_name}}:z"         
+         command: "terraform destroy -force -input=false -var 'name={{cluster_name}}' -auto-approve -no-color ."
       register: terraform_destroy_container
 
     - name: display Terraform destroy {{cluster_name}} cluster
