@@ -1,0 +1,33 @@
+---
+- name: Destroy Kuberntes eks cluster in aws
+  hosts: localhost
+  become: true
+  vars:
+      clusters_path: /
+      cluster_name: "{{ cluster_name }}"
+  tasks:
+    - name: Log into DockerHub
+      become: true
+      docker_login:
+         username: naveenvemuri9
+         password: NavIN@4779
+         email: vemnaveen07@gmail.com
+
+    - name: Terraform init {{cluster_name}} cluster
+      become: true   
+      docker_container:
+         name: "terraform-init-{{cluster_name}}"
+         image: naveenvemuri9/awscli-terraform-kubectl
+         working_dir: "/{{cluster_name}}"
+         detach: false
+         privileged: yes
+         volumes: 
+           - "{{cluster_home}}:/{{cluster_name}}:z"         
+         command: "terraform destroy -input=false -var 'name={{cluster_name}}' -no-color ."
+      register: terraform_destroy_container
+
+    - name: display Terraform destroy {{cluster_name}} cluster
+      debug:
+        msg:  "{{ terraform_destroy_container.ansible_facts.docker_container.Output }}"
+
+ 
