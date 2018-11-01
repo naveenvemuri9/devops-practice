@@ -21,7 +21,7 @@ pipeline{
                       ansiColor('xterm'){
                                       echo 'Creating node'
                                       sh(script: 'ansible-playbook --extra-vars' +
-                                              ' "cluster_name=$CLUSTER_NAME eks_provision_cluster.yaml')
+                                              ' "cluster_name=$CLUSTER_NAME" eks_provision_cluster.yaml')
                                       sh(script: 'echo Cluster IP:')
                                      }
                     } else if (env.OP_TYPE == 'INSTALL GO APP') {
@@ -35,7 +35,7 @@ pipeline{
                       ansiColor('xterm'){
                                       echo 'Deleting node'
                                       sh(script: 'ansible-playbook --extra-vars' +
-                                              ' "cluster_name=$CLUSTER_NAME destroy_cluster.yaml')
+                                              ' "cluster_name=$CLUSTER_NAME" destroy_cluster.yaml')
                        }
                     }  
                  }
