@@ -18,7 +18,6 @@
       docker_container:
          name: "terraform-init-{{cluster_name}}"
          image: naveenvemuri9/awscli-terraform-kubectl
-         working_dir: "/{{cluster_name}}"
          detach: false
          privileged: yes
          volumes: 
@@ -35,7 +34,6 @@
       docker_container:
          name: "terraform-init-{{cluster_name}}"
          image: naveenvemuri9/awscli-terraform-kubectl
-         working_dir: "/{{cluster_name}}"
          detach: false
          privileged: yes
          volumes: 
@@ -60,7 +58,6 @@
       docker_container:
          name: "terraform-init-{{cluster_name}}"
          image: naveenvemuri9/awscli-terraform-kubectl
-         working_dir: "/{{cluster_name}}"
          detach: false
          privileged: yes
          volumes:      
@@ -76,7 +73,6 @@
       docker_container:
          name: "terraform-init-{{cluster_name}}"
          image: naveenvemuri9/awscli-terraform-kubectl
-         working_dir: "/{{cluster_name}}"
          detach: false
          privileged: yes
          volumes:      
