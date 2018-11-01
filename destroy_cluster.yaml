@@ -3,7 +3,7 @@
   hosts: localhost
   become: true
   vars:
-      clusters_path: /
+      cluster_home: /
       cluster_name: "{{ cluster_name }}"
   tasks:
     - name: Log into DockerHub
