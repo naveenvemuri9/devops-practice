@@ -26,7 +26,7 @@ spec:
           protocol: TCP
 
       imagePullSecrets:
-        - name: myregistrykey 
+        - name: dockerRegsitryKey 
 
 ---
 # ------------------- Service ------------------- #
