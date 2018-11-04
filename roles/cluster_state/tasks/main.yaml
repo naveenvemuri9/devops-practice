@@ -1,0 +1,16 @@
+---
+- name: Ensure cluster home is created for {{cluster_name}}
+  file:
+    path: "{{clusters_path}}/{{cluster_name}}"
+    state: directory
+    mode: 0755
+
+- name: set {{cluster_name}} home fact
+  set_fact:
+    cluster_home: "{{clusters_path}}/{{cluster_name}}"
+
+- name: set {{cluster_name}} output state dir
+  file:
+    path: "{{cluster_home}}/state"
+    state: directory
+    mode: 0755

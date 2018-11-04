@@ -1,0 +1,51 @@
+---
+- name: Deploy Go-app on eks cluster
+  hosts: localhost
+  become: true  
+  tasks:
+  - name: Get cluster identity
+    command: "aws sts get-caller-identity"
+    register: docker_apply_eks
+
+    - name: display logs
+      debug:
+        msg:  "{{ docker_apply_eks.ansible_facts.docker_container.Output }}"
+
+    - name: Get the kube config to local directory
+      command: "aws eks update-kubeconfig --name {{cluster_name}}"
+      register: docker_apply_eks_kube
+
+    - name: display logs
+      debug:
+        msg:  "{{ docker_apply_eks_kube.ansible_facts.docker_container.Output }}"
+
+    - name: Find Arn fpr instance role
+      command: "aws iam get-role --role-name terraform-eks-{{cluster_name}}-node | jq -r  '.Role.Arn'"
+      register: cluster-arn
+
+    - name: set cluster arn variable
+      set_fact: 
+        cluster-arn: "{{cluster-arn}}"
+
+    - name: Copy auth file to /tmp
+      template:
+        src: "{{playbook_dir}}/aws-auth.j2"
+        dest: /tmp/aws-auth.yaml
+
+    - name: Apply aws-auth to eks cluster
+      command: "kubectl apply -f aws-auth.yaml"
+
+    - name: Apply calico to eks cluster
+      command: "kubectl apply -f {{playbook_dir}}/aws-auth.yaml"
+
+    - name: Create cluster role
+      command: "kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default"
+
+    - name: Add Docker registry screts
+      command: "kubectl create secret docker-registry dockerRegsitryKey --docker-server="https://hub.docker.com"  --docker-username=naveenvemuri9 --docker-password=NavIN@4779 --docker-email=vemnaveen07@gmail.com" 
+
+    - name: Deploy go-app onto eks cluster
+      command: "kubectl apply -f {{playbook_dir}}/go-app/go-app.yml"
+
+
+

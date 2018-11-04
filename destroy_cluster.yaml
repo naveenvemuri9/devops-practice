@@ -1,47 +1,52 @@
 ---
-- name: Destroy Kuberntes eks cluster in aws
+- name: Provision Kuberntes eks cluster in aws
   hosts: localhost
   become: true
-  vars:
-      cluster_home: /
-      cluster_name: "{{ cluster_name }}"
+  roles:
+    - cluster_state    
   tasks:
     - name: Log into DockerHub
-      become: true
       docker_login:
          username: naveenvemuri9
          password: NavIN@4779
          email: vemnaveen07@gmail.com
 
+    - name: Copy terraform scripts to {{cluster_home}}
+      copy:
+        src: "{{playbook_dir}}/terraform-scripts"
+        dest: "{{cluster_home}}/"
+        force: true
+
     - name: Terraform init {{cluster_name}} cluster
-      become: true   
+      become: true
       docker_container:
          name: "terraform-init-{{cluster_name}}"
-         image: naveenvemuri9/awscli-terraform-kubectl
+         image: naveenvemuri9/eks-terraform-cli-amazing
+         working_dir: "/{{cluster_name}}"
          detach: false
          privileged: yes
-         volumes: 
-           - "{{cluster_home}}:/{{cluster_name}}:z"         
-         command: "terraform init -input=false -var 'name={{cluster_name}}' -no-color ."
+         volumes:
+           - "{{cluster_home}}:/{{cluster_name}}:z"
+         command: "terraform init -input=false -var 'name={{cluster_name}}' -no-color /{{cluster_name}}/terraform-scripts"
       register: terraform_init_container
 
-    - name: Terraform destroy {{cluster_name}} cluster
+    - name: display Terraform init {{cluster_name}} cluster
       debug:
         msg:  "{{ terraform_init_container.ansible_facts.docker_container.Output }}"
-    - name: Terraform init {{cluster_name}} cluster
-      become: true   
+    
+    - name: Provision {{cluster_name}} cluster
+      become: true    
       docker_container:
          name: "terraform-init-{{cluster_name}}"
-         image: naveenvemuri9/awscli-terraform-kubectl
+         image: naveenvemuri9/eks-terraform-cli-amazing
+         working_dir: "/{{cluster_name}}"
          detach: false
          privileged: yes
          volumes: 
-           - "{{cluster_home}}:/{{cluster_name}}:z"         
-         command: "terraform destroy -force -input=false -var 'name={{cluster_name}}' -auto-approve -no-color ."
-      register: terraform_destroy_container
+           - "{{cluster_home}}:/{{cluster_name}}:z"
+         command: "terraform destroy -force -var 'name={{cluster_name}}' -auto-approve -no-color /{{cluster_name}}/terraform-scripts"
+      register: terraform_apply_container
 
-    - name: display Terraform destroy {{cluster_name}} cluster
+    - name: display Provision {{cluster_name}} cluster ID
       debug:
-        msg:  "{{ terraform_destroy_container.ansible_facts.docker_container.Output }}"
-
- 
+        msg:  "{{ terraform_apply_container.ansible_facts.docker_container.Output }}"

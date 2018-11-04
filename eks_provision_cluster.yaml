@@ -2,84 +2,61 @@
 - name: Provision Kuberntes eks cluster in aws
   hosts: localhost
   become: true
-  vars:
-      cluster_home: /
-      cluster_name: "{{ cluster_name }}"
+  roles:
+    - cluster_state  
   tasks:
     - name: Log into DockerHub
-      become: true
       docker_login:
          username: naveenvemuri9
          password: NavIN@4779
          email: vemnaveen07@gmail.com
 
+    - name: Copy terraform scripts to {{cluster_home}}
+      become: true
+      copy:
+        src: "{{playbook_dir}}/terraform-scripts"
+        dest: "{{cluster_home}}/"
+        force: true
+
     - name: Terraform init {{cluster_name}} cluster
-      become: true   
+      become: true
+      async: 4500
+      poll: 10  
       docker_container:
          name: "terraform-init-{{cluster_name}}"
-         image: naveenvemuri9/awscli-terraform-kubectl
+         image: naveenvemuri9/eks-terraform-cli-amazing
+         working_dir: "/{{cluster_name}}"
          detach: false
          privileged: yes
-         volumes: 
-           - "{{cluster_home}}:/{{cluster_name}}:z"         
-         command: "terraform init -input=false -var 'name={{cluster_name}}' -no-color ."
+         stop_timeout: 4500
+         volumes:
+           - "{{cluster_home}}:/{{cluster_name}}:z"
+         command: "terraform init -input=false -var 'name={{cluster_name}}' -no-color /{{cluster_name}}/terraform-scripts"
       register: terraform_init_container
 
     - name: display Terraform init {{cluster_name}} cluster
       debug:
         msg:  "{{ terraform_init_container.ansible_facts.docker_container.Output }}"
-
+    
     - name: Provision {{cluster_name}} cluster
       become: true    
+      async: 1500
+      poll: 10
       docker_container:
          name: "terraform-init-{{cluster_name}}"
-         image: naveenvemuri9/awscli-terraform-kubectl
+         image: naveenvemuri9/eks-terraform-cli-amazing
+         working_dir: "/{{cluster_name}}"
          detach: false
          privileged: yes
+         stop_timeout: 1500
          volumes: 
            - "{{cluster_home}}:/{{cluster_name}}:z"
-         command: "terraform apply -input=false  -var 'name={{cluster_name}}' -auto-approve -no-color ."
+         command: "terraform apply -input=false -var 'name={{cluster_name}}' -auto-approve -no-color /{{cluster_name}}/terraform-scripts"
+      when: terraform_init_container is succeeded
       register: terraform_apply_container
 
     - name: display Provision {{cluster_name}} cluster ID
       debug:
         msg:  "{{ terraform_apply_container.ansible_facts.docker_container.Output }}"
 
-    - name: Store output of the provision command
-      shell: "docker logs {{terraform_apply_container.ansible_facts.docker_container.Id}} 2>&1 | tee
-      {{cluster_home}}/state/provision.log"
-      register: docker_logs        
-
-    - name: Print provisioner log
-      debug:
-        msg: "{{docker_logs.stdout_lines}}"
-
-    - name: Get cluster identity
-      docker_container:
-         name: "terraform-init-{{cluster_name}}"
-         image: naveenvemuri9/awscli-terraform-kubectl
-         detach: false
-         privileged: yes
-         volumes:      
-           - "{{cluster_home}}:/{{cluster_name}}:z"
-         command: "aws sts get-caller-identity"
-      register: docker_apply_eks
-
-    - name: display logs
-      debug:
-        msg:  "{{ docker_apply_eks.ansible_facts.docker_container.Output }}"
-
-    - name: Get the kube config to local directory
-      docker_container:
-         name: "terraform-init-{{cluster_name}}"
-         image: naveenvemuri9/awscli-terraform-kubectl
-         detach: false
-         privileged: yes
-         volumes:      
-           - "{{cluster_home}}:/{{cluster_name}}:z"
-         command: "aws eks update-kubeconfig --name {{cluster_name}}"
-      register: docker_apply_eks_kube
-
-    - name: display logs
-      debug:
-        msg:  "{{ docker_apply_eks_kube.ansible_facts.docker_container.Output }}"
+ 

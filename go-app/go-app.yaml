@@ -1,0 +1,51 @@
+# ------------------- Deployment ------------------- #
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: go-app
+  namespace: default
+  labels:
+    app: go-app
+spec:
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: go-app
+  template:
+    metadata:
+      labels:
+        k8s-app: go-app
+    spec:
+      containers:
+      - name: go-app
+        image: naveenvemuri9/go-app
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+
+      imagePullSecrets:
+        - name: myregistrykey 
+
+---
+# ------------------- Service ------------------- #
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: go-app
+  namespace: default
+  labels:
+    app: go-app
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+    - name: https
+      port: 443
+      targetPort: 8000
+  selector:
+    k8s-app: go-app

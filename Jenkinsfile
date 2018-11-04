@@ -28,7 +28,7 @@ pipeline{
                         ansiColor('xterm') {
                             echo 'Installing Go App'
                             sh(script: '''
-                              ansible-playbook install_go_app.yaml
+                              ansible-playbook deployment.yaml
                              ''')
                         }
                     } else if (env.OP_TYPE == 'DESTROY CLUSTER') {
