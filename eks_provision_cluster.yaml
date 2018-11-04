@@ -14,7 +14,7 @@
     - name: Copy terraform scripts to {{cluster_home}}
       become: true
       copy:
-        src: "{{playbook_dir}}/terraform-scripts"
+        src: "{{playbook_dir}}/terraform"
         dest: "{{cluster_home}}/"
         force: true
 
@@ -31,7 +31,7 @@
          stop_timeout: 4500
          volumes:
            - "{{cluster_home}}:/{{cluster_name}}:z"
-         command: "terraform init -input=false -var 'name={{cluster_name}}' -no-color /{{cluster_name}}/terraform-scripts"
+         command: "terraform init -input=false -var 'name={{cluster_name}}' -no-color /{{cluster_name}}/terraform"
       register: terraform_init_container
 
     - name: display Terraform init {{cluster_name}} cluster
@@ -51,7 +51,7 @@
          stop_timeout: 1500
          volumes: 
            - "{{cluster_home}}:/{{cluster_name}}:z"
-         command: "terraform apply -input=false -var 'name={{cluster_name}}' -auto-approve -no-color /{{cluster_name}}/terraform-scripts"
+         command: "terraform apply -input=false -var 'name={{cluster_name}}' -auto-approve -no-color /{{cluster_name}}/terraform"
       when: terraform_init_container is succeeded
       register: terraform_apply_container
 
@@ -59,4 +59,3 @@
       debug:
         msg:  "{{ terraform_apply_container.ansible_facts.docker_container.Output }}"
 
- 

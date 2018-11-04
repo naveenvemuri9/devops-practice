@@ -13,7 +13,7 @@
 
     - name: Copy terraform scripts to {{cluster_home}}
       copy:
-        src: "{{playbook_dir}}/terraform-scripts"
+        src: "{{playbook_dir}}/terraform"
         dest: "{{cluster_home}}/"
         force: true
 
@@ -27,7 +27,7 @@
          privileged: yes
          volumes:
            - "{{cluster_home}}:/{{cluster_name}}:z"
-         command: "terraform init -input=false -var 'name={{cluster_name}}' -no-color /{{cluster_name}}/terraform-scripts"
+         command: "terraform init -input=false -var 'name={{cluster_name}}' -no-color /{{cluster_name}}/terraform"
       register: terraform_init_container
 
     - name: display Terraform init {{cluster_name}} cluster
@@ -44,7 +44,7 @@
          privileged: yes
          volumes: 
            - "{{cluster_home}}:/{{cluster_name}}:z"
-         command: "terraform destroy -force -var 'name={{cluster_name}}' -auto-approve -no-color /{{cluster_name}}/terraform-scripts"
+         command: "terraform destroy -force -var 'name={{cluster_name}}' -auto-approve -no-color /{{cluster_name}}/terraform"
       register: terraform_apply_container
 
     - name: display Provision {{cluster_name}} cluster ID
