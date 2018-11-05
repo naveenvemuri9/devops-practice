@@ -16,7 +16,7 @@ Setup CI system
 ```
 - Java jdk 
 - ansible 
-- aws cli 
+- awscli 
 - Kubectl 
 - iam-authenticator
 - Docker
@@ -26,8 +26,7 @@ Setup CI system
 Infrastructure Provisoning from command line:
 ---------------------------------------------
 - Give the required credentials in dockerfile.
-- Build the terraform image and push to docker registry.
-- Build and push the docker image for go-app.
+- Build and push the docker images for go-app,terraform to docker registry.
 
 1. Provison Eks cluster
 -----------------------
@@ -52,5 +51,3 @@ Application Deployment:
 ```
 $ ansible-playbook deployment.yaml
 ```
-
-Future 

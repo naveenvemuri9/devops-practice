@@ -5,12 +5,6 @@
   roles:
     - cluster_state  
   tasks:
-    - name: Log into DockerHub
-      docker_login:
-         username: naveenvemuri9
-         password: NavIN@4779
-         email: vemnaveen07@gmail.com
-
     - name: Copy terraform scripts to {{cluster_home}}
       become: true
       copy:
