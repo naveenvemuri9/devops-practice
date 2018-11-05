@@ -41,9 +41,8 @@ pipeline{
                     } else if (env.OP_TYPE == 'INSTALL GO APP') {
                         ansiColor('xterm') {
                             echo 'Installing Go App'
-                            sh(script: '''
-                              ansible-playbook deployment.yaml
-                             ''')
+                                      sh(script: 'ansible-playbook --extra-vars' +
+                                              ' "cluster_name=$CLUSTER_NAME" deployment.yaml')                            
                         }
                     } else if (env.OP_TYPE == 'DESTROY CLUSTER') {
                       ansiColor('xterm'){

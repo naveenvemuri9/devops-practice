@@ -5,7 +5,7 @@ metadata:
   namespace: kube-system
 data:
   mapRoles: |
-    - rolearn: {{cluster-arn}}
+    - rolearn: {{clusterarn}}
       username: system:node:{{EC2PrivateDNSName}}
       groups:
         - system:bootstrappers

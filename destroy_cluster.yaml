@@ -5,12 +5,6 @@
   roles:
     - cluster_state    
   tasks:
-    - name: Log into DockerHub
-      docker_login:
-         username: naveenvemuri9
-         password: NavIN@4779
-         email: vemnaveen07@gmail.com
-
     - name: Copy terraform scripts to {{cluster_home}}
       copy:
         src: "{{playbook_dir}}/terraform"
@@ -34,7 +28,7 @@
       debug:
         msg:  "{{ terraform_init_container.ansible_facts.docker_container.Output }}"
     
-    - name: Provision {{cluster_name}} cluster
+    - name: Destroy {{cluster_name}} cluster
       become: true    
       docker_container:
          name: "terraform-init-{{cluster_name}}"
@@ -45,8 +39,8 @@
          volumes: 
            - "{{cluster_home}}:/{{cluster_name}}:z"
          command: "terraform destroy -force -var 'name={{cluster_name}}' -auto-approve -no-color /{{cluster_name}}/terraform"
-      register: terraform_apply_container
+      register: terraform_destroy_container
 
-    - name: display Provision {{cluster_name}} cluster ID
+    - name: display Destroy {{cluster_name}} cluster ID
       debug:
-        msg:  "{{ terraform_apply_container.ansible_facts.docker_container.Output }}"
+        msg:  "{{ terraform_destroy_container.ansible_facts.docker_container.Output }}"
