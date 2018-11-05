@@ -1,0 +1,7 @@
+---
+- name: Uninstall Go-app on eks cluster
+  hosts: localhost
+  become: true  
+  tasks:
+    - name: Deploy go-app onto eks cluster
+      command: "kubectl delete -f {{playbook_dir}}/go-app/go-app.yaml"

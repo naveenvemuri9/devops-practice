@@ -6,7 +6,7 @@ pipeline{
     }
 
     parameters {
-        choice(name: 'OP_TYPE', choices: 'CREATE CLUSTER\nDESTROY CLUSTER\nINSTALL GO APP', description: 'Type of Operation')
+        choice(name: 'OP_TYPE', choices: 'CREATE CLUSTER\nDESTROY CLUSTER\nINSTALL GO APP\nUNINSTALL GO APP', description: 'Type of Operation')
         string(name: 'CLUSTER_NAME', defaultValue: "", description: 'Provide unique alphanumeric value')
     }
     stages{
@@ -50,7 +50,12 @@ pipeline{
                                       sh(script: 'ansible-playbook --extra-vars' +
                                               ' "cluster_name=$CLUSTER_NAME" destroy_cluster.yaml')
                        }
-                    }  
+                    } else if (env.OP_TYPE == 'UNINSTALL GO APP') {
+                      ansiColor('xterm'){
+                                      echo 'Deleting node'
+                                      sh(script: 'ansible-playbook uninstall-go-app.yaml')
+                       }
+                    }                     
                  }
               }
         }

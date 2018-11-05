@@ -49,5 +49,10 @@ Application Deployment:
 ----------------------------
 - For deploying go-app to k8s cluster
 ```
-$ ansible-playbook deployment.yaml
+$ ansible-playbook deployment.yaml --extra-vars "cluster_name=YOUR_CLUSTER_NAME"
+```
+2. Uninstall GO-APP 
+- To uninstall go-app
+```
+$ ansible-playbook unintall-go-app.yaml
 ```
