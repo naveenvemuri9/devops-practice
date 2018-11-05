@@ -21,20 +21,22 @@
 
     - name: Apply aws-auth to eks cluster
       command: "kubectl apply -f aws-auth.yaml"
+      register: apply_aws_auth
 
     - name: Apply calico to eks cluster
       command: "kubectl apply -f {{playbook_dir}}/calico.yaml"
+      register: eks_calico
 
     - name: Create cluster role
       command: "kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default"
+      register: cluster_role
 
     - name: Add Docker registry secrets
-      command: "kubectl create secret docker-registry regsitrykey --docker-server=https://hub.docker.com --docker-username=naveenvemuri9 --docker-password=NavIN@4779 --docker-email=vemnaveen07@gmail.com" 
+      command: "kubectl create secret docker-registry regsitrykey --docker-server=https://hub.docker.com --docker-username=YOUR_USERNAME --docker-password=YOUR_PASSWORD --docker-email=YOUR_EMAIL"
+      register: docker_regsitry 
 
     - name: Deploy go-app onto eks cluster
       command: "kubectl apply -f {{playbook_dir}}/go-app/go-app.yaml"
-
-    - name: enable autoscalling
-      command: "kubectl autoscale rs go-app --min=2 --max=5 --cpu-percent=80"      
+      register: apply_go_app_eks_cluster
 
 

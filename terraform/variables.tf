@@ -2,10 +2,10 @@ variable region {
   default = "us-east-1"
 }
 
-variable name {
-  default = "nv250022"
+variable "cluster_name" {
+  type    = "string"
+  default = ""
 }
-
 variable node_type {
   default = "m4.large"
 }
