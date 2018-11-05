@@ -11,6 +11,20 @@ pipeline{
     }
     stages{
 
+        stage("Build Docker Image"){
+          agent any
+          steps{
+            checkout scm
+             withCredentials([usernamePassword(credentialsId: 'jenkins_dockerhub_credentials', passwordVariable: 'DOCKER_HUB_PASSWORD', usernameVariable: 'DOCKER_HUB_USER')]){
+                 script{
+                       sh "docker login -u ${env.DOCKER_HUB_USER} -p ${env.DOCKER_HUB_PASSWORD}"
+                       sh "cd ./go-app && docker build -t go-app ."
+                       sh "docker tag go-app naveenvemuri9/go-app:latest" 
+                       sh "docker push naveenvemuri9/go-app:latest"
+                 }
+            }
+        }
+      }
         stage("create and deploy stage"){
           agent any
           steps{

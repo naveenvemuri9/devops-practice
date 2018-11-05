@@ -36,7 +36,7 @@
       command: "kubectl apply -f aws-auth.yaml"
 
     - name: Apply calico to eks cluster
-      command: "kubectl apply -f {{playbook_dir}}/aws-auth.yaml"
+      command: "kubectl apply -f {{playbook_dir}}/calico.yaml"
 
     - name: Create cluster role
       command: "kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default"
@@ -47,5 +47,7 @@
     - name: Deploy go-app onto eks cluster
       command: "kubectl apply -f {{playbook_dir}}/go-app/go-app.yml"
 
+    - name: enable autoscalling
+      command: "kubectl autoscale rs go-app --min=2 --max=5 --cpu-percent=80"      
 
 
